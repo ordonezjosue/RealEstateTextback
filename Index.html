@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>The Missed-Call Text-Back – ROI Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg-main: #f3f6ff;
+      --card-bg: #ffffff;
+      --primary: #c935ff;
+      --primary-dark: #9e25d0;
+      --accent: #3f5cff;
+      --text-main: #1f2933;
+      --text-muted: #6b7280;
+      --border-soft: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        system-ui, -webkit-system-font, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top nav */
+    .navbar {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #ff5bb5, #c935ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      font-size: 15px;
+      line-height: 1.1;
+    }
+
+    .logo-title-main {
+      font-weight: 700;
+    }
+    .logo-title-sub {
+      font-weight: 500;
+      color: var(--accent);
+    }
+
+    .nav-right button {
+      padding: 9px 18px;
+      font-size: 14px;
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .nav-right button:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* Main content */
+    .page-wrap {
+      flex: 1;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto 40px auto;
+      padding: 0 20px 40px;
+      display: grid;
+      grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+      gap: 40px;
+      align-items: center;
+    }
+
+    /* Calculator card */
+    .card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      box-shadow: 0 15px 40px rgba(15, 23, 42, 0.11);
+      padding: 24px 24px 26px;
+    }
+
+    .card h2 {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .form-group input {
+      padding: 10px 11px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border-soft);
+      outline: none;
+      transition: border 0.16s ease, box-shadow 0.16s ease;
+      background-color: #f9fafb;
+    }
+
+    .form-group input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(63, 92, 255, 0.25);
+      background-color: #fff;
+    }
+
+    .btn-primary {
+      margin-top: 6px;
+      width: 100%;
+      padding: 11px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      font-weight: 600;
+      font-size: 15px;
+      transition: filter 0.14s ease, transform 0.06s ease;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      filter: brightness(0.96);
+      transform: translateY(0);
+    }
+
+    .results {
+      margin-top: 18px;
+      border-top: 1px dashed #e5e7eb;
+      padding-top: 14px;
+      font-size: 14px;
+    }
+
+    .results p {
+      margin-bottom: 5px;
+    }
+
+    .results span.value {
+      font-weight: 700;
+    }
+
+    /* Right side copy */
+    .content {
+      max-width: 560px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(201, 53, 255, 0.08);
+      color: var(--primary-dark);
+      font-weight: 600;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    h1 {
+      font-size: 30px;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+
+    .subhead {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .bullets {
+      list-style: none;
+      margin-bottom: 22px;
+    }
+
+    .bullets li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+    }
+
+    .bullets li::before {
+      content: "✔";
+      color: #10b981;
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .cta-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 20px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(201, 53, 255, 0.35);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .cta-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 40px rgba(201, 53, 255, 0.45);
+    }
+
+    .cta-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 10px 24px rgba(201, 53, 255, 0.35);
+    }
+
+    .cta-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Fake “blob” behind avatar */
+    .hero-blob {
+      position: absolute;
+      right: 8%;
+      bottom: 18%;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle at 30% 30%, #fce7ff, #e2e8ff);
+      opacity: 0.7;
+      border-radius: 999px;
+      z-index: -1;
+    }
+
+    /* Circle video/avatar */
+    .coach-avatar {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.6);
+      background: #000;
+      z-index: 20;
+    }
+
+    .coach-avatar video,
+    .coach-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .coach-avatar-overlay {
+      position: absolute;
+      top: 6px;
+      left: 8px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.78);
+      color: #f9fafb;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .page-wrap {
+        grid-template-columns: 1fr;
+        margin-top: 10px;
+      }
+      .hero-blob {
+        display: none;
+      }
+      .coach-avatar {
+        width: 120px;
+        height: 120px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .navbar {
+        padding-top: 14px;
+        padding-bottom: 10px;
+      }
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Top nav -->
+  <header class="navbar">
+    <div class="logo-wrap">
+      <div class="logo-icon">MC</div>
+      <div class="logo-text">
+        <span class="logo-title-main">The Missed-Call</span>
+        <span class="logo-title-sub">Text-Back</span>
+      </div>
+    </div>
+    <div class="nav-right">
+      <button onclick="alert('Hook this to your demo booking page.')">
+        Try a Demo
+      </button>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="page-wrap">
+    <!-- LEFT: Calculator -->
+    <section class="card" aria-label="ROI Calculator">
+      <h2>ROI Calculator</h2>
+
+      <div class="form-group">
+        <label for="clientValue">Average Client Value ($)</label>
+        <input id="clientValue" type="number" min="0" step="1" value="9000" />
+      </div>
+
+      <div class="form-group">
+        <label for="missedCalls">Missed Calls per Week</label>
+        <input id="missedCalls" type="number" min="0" step="1" value="20" />
+      </div>
+
+      <div class="form-group">
+        <label for="closeRate">Average Close Rate (%)</label>
+        <input id="closeRate" type="number" min="0" max="100" step="1" value="20" />
+      </div>
+
+      <button class="btn-primary" id="calcBtn">Calculate ROI</button>
+
+      <div class="results" id="results">
+        <p>Monthly $$$ Left on Table: <span class="value" id="monthlyLeft">$0.00</span></p>
+        <p>We Charge (per month): <span class="value" id="monthlyFee">$297.00</span></p>
+        <p>ROI: <span class="value" id="roiPercent">0.00%</span></p>
+      </div>
+    </section>
+
+    <!-- RIGHT: Sales copy -->
+    <section class="content">
+      <div class="badge">Missed Call → Automatic Text Follow-Up</div>
+
+      <h1>Get An Estimate Of How Much Your Missed Calls Are Costing You</h1>
+
+      <p class="subhead">
+        Every unanswered call could be a paying customer. Use the calculator to
+        see how much revenue you’re leaving on the table each month – and how
+        fast our Missed-Call Text-Back can pay for itself.
+      </p>
+
+      <ul class="bullets">
+        <li>Enter the average lifetime value of a customer.</li>
+        <li>Estimate how many calls you miss per week.</li>
+        <li>Enter your close rate when you actually talk to leads.</li>
+        <li>Hit <strong>Calculate</strong> and see your potential recovered revenue and ROI.</li>
+      </ul>
+
+      <button class="cta-primary">
+        Get Started Risk-Free for 7 Days
+      </button>
+      <div class="cta-note">
+        No contracts. Plug into your existing phone system in minutes.
+      </div>
+
+      <div class="hero-blob"></div>
+    </section>
+  </main>
+
+  <!-- Bottom-right avatar / Loom-style bubble -->
+  <div class="coach-avatar">
+    <!-- Swap this <img> for a Loom iframe or HTML5 video if you want -->
+    <img src="https://via.placeholder.com/300x300.png?text=Your+Video" alt="Founder video" />
+    <div class="coach-avatar-overlay">Watch how it works →</div>
+  </div>
+
+  <script>
+    // CONFIG – change this to whatever you charge monthly
+    const MONTHLY_FEE = 297;
+    const WEEKS_PER_MONTH = 4.33; // more realistic than 4
+
+    const clientValueEl = document.getElementById("clientValue");
+    const missedCallsEl = document.getElementById("missedCalls");
+    const closeRateEl = document.getElementById("closeRate");
+
+    const monthlyLeftEl = document.getElementById("monthlyLeft");
+    const monthlyFeeEl = document.getElementById("monthlyFee");
+    const roiPercentEl = document.getElementById("roiPercent");
+
+    monthlyFeeEl.textContent = formatCurrency(MONTHLY_FEE);
+
+    document.getElementById("calcBtn").addEventListener("click", () => {
+      const clientValue = +clientValueEl.value || 0;
+      const missedPerWeek = +missedCallsEl.value || 0;
+      const closeRate = (+closeRateEl.value || 0) / 100;
+
+      // Calculate expected lost revenue per month
+      const lostLeadsPerMonth = missedPerWeek * WEEKS_PER_MONTH;
+      const lostClientsPerMonth = lostLeadsPerMonth * closeRate;
+      const monthlyLeft = lostClientsPerMonth * clientValue;
+
+      const roi =
+        MONTHLY_FEE > 0 ? (monthlyLeft / MONTHLY_FEE) * 100 : 0;
+
+      monthlyLeftEl.textContent = formatCurrency(monthlyLeft);
+      roiPercentEl.textContent = roi.toFixed(2).toLocaleString() + "%";
+    });
+
+    function formatCurrency(value) {
+      return (
+        "$" +
+        value.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })
+      );
+    }
+
+    // Run once on load
+    document.getElementById("calcBtn").click();
+  </script>
+</body>
+</html>
